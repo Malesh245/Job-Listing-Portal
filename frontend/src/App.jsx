@@ -1,83 +1,168 @@
-import React from "react";
-import { Navigate, Outlet, Route, Routes, useLocation } from "react-router-dom";
+import { createBrowserRouter, RouterProvider } from "react-router-dom";
 import "./App.css";
-import Navbar from "./components/Navbar";
-import { ToastContainer } from "react-toastify";
-import "react-toastify/dist/ReactToastify.css";
-import Home from "./Pages/Home";
-import About from "./Pages/About";
-import CreateJob from "./Pages/CreateJob";
-import MyJobs from "./Pages/MyJobs";
-import SalaryPage from "./Pages/SalaryPage";
-import UpdateJob from "./Pages/UpdateJob";
-import JobDetails from "./Pages/JobDetails";
-import ForgotPassword from "./components/ForgotPassword";
-import VerifyEmail from "./components/VerifyEmail";
-import ResetPassword from "./components/ResetPassword";
-import Auth from "./Pages/Auth";
-import CompanyProfile from "./Pages/CompanyProfile";
-import UserProfile from "./Pages/UserProfile";
-import Footer from "./components/Footer";
-import { useSelector } from "./redux/store";
+import Layout from "./components/Layout";
+import Home from "./components/Home";
+import Jobs from "./components/Jobs";
+import JobDescription from "./components/JobDescription";
+import Browse from "./components/Browse";
+import Login from "./components/auth/Login";
+import Signup from "./components/auth/Singup";
+import Profile from "./components/Profile";
+import ResetPassword from "./components/auth/ResetPassword";
+import ForgotPassword from "./components/auth/ForgotPassword";
+import VerifyEmail from "./components/auth/VerifyEmail";
+import CreateJobs from "./components/admin/CreateJobs";
+import Applicants from "./components/admin/Applicants";
+import Companies from "./components/Companies";
+import CompanyCreate from "./components/CompanyCreate";
+import CompanySetup from "./components/CompanySetup";
+import PostedJobs from "./components/PostedJobs";
+import ProtectedRoute from "./components/admin/ProtectedRoute";
+import About from "./components/About";
+import Contact from "./components/Contact";
+import Blog from "./components/Blog";
+import FAQs from "./components/FAQs";
+import PrivacyPolicy from "./components/PrivacyPolicy";
+import TermsConditions from "./components/TermsConditions";
+import UpdateJob from "./components/admin/UpdateJob";
 
-function Layout() {
-  const { user } = useSelector((state) => state.user);
-  const location = useLocation();
+const appRouter = createBrowserRouter([
+  {
+    path: "/",
+    element: <Layout />,
+    children: [
+      {
+        path: "/",
+        element: <Home />,
+      },
+      {
+        path: "/jobs",
+        element: <Jobs />,
+      },
+      {
+        path: "/description/:id",
+        element: <JobDescription />,
+      },
+      {
+        path: "/browse",
+        element: <Browse />,
+      },
+      {
+        path: "/login",
+        element: <Login />,
+      },
+      {
+        path: "/signup",
+        element: <Signup />,
+      },
+      {
+        path: "/profile",
+        element: <Profile />,
+      },
+      {
+        path: "/forgot-password",
+        element: <ForgotPassword />,
+      },
+      {
+        path: "/reset-password",
+        element: <ResetPassword />,
+      },
+      {
+        path: "/verify-email",
+        element: <VerifyEmail />,
+      },
+      {
+        path: "/about",
+        element: <About />,
+      },
+      {
+        path: "/contact",
+        element: <Contact />,
+      },
+      {
+        path: "/blog",
+        element: <Blog />,
+      },
+      {
+        path: "/faqs",
+        element: <FAQs />,
+      },
+      {
+        path: "/privacy-policy",
+        element: <PrivacyPolicy />,
+      },
+      {
+        path: "/terms-conditions",
+        element: <TermsConditions />,
+      },
 
-  return user?.token ? (
-    <Outlet />
-  ) : (
-    <Navigate to="/user-auth" state={{ from: location }} replace />
+      // Admin Dashboard Route Started
+      {
+        path: "/admin/jobs",
+        element: (
+          <ProtectedRoute>
+            <PostedJobs />
+          </ProtectedRoute>
+        ),
+      },
+      {
+        path: "/admin/jobs/create",
+        element: (
+          <ProtectedRoute>
+            <CreateJobs />
+          </ProtectedRoute>
+        ),
+      },
+      {
+        path: "/admin/jobs/:id/applicants",
+        element: (
+          <ProtectedRoute>
+            <Applicants />
+          </ProtectedRoute>
+        ),
+      },
+      {
+        path: "/admin/companies",
+        element: (
+          <ProtectedRoute>
+            <Companies />
+          </ProtectedRoute>
+        ),
+      },
+      {
+        path: "/admin/companies/create",
+        element: (
+          <ProtectedRoute>
+            <CompanyCreate />
+          </ProtectedRoute>
+        ),
+      },
+      {
+        path: "/admin/companies/:id",
+        element: (
+          <ProtectedRoute>
+            <CompanySetup />
+          </ProtectedRoute>
+        ),
+      },
+      {
+        path: "/admin/jobs/:jobId/edit",
+        element: (
+          <ProtectedRoute>
+            <UpdateJob />
+          </ProtectedRoute>
+        ),
+      },
+    ],
+  },
+]);
+
+function App() {
+  return (
+    <div>
+      <RouterProvider router={appRouter} />
+    </div>
   );
 }
-
-const App = () => {
-  const { user } = useSelector((state) => state.user);
-  return (
-    <main className="bg-[#f7fdfd]">
-      <ToastContainer />
-      <Navbar />
-      <Routes>
-        {/* Routes that don't require authentication */}
-        <Route path="/" element={<Home />} />
-        <Route path="/about" element={<About />} />
-        <Route path="/user-auth" element={<Auth />} />
-        <Route path="/forgot-password" element={<ForgotPassword />} />
-        <Route path="/reset-password" element={<ResetPassword />} />
-        <Route path="/verify-email" element={<VerifyEmail />} />
-
-        {/* Routes that require authentication */}
-        <Route element={<Layout />}>
-          <Route path="/find-jobs" element={<Home />} />
-          <Route path="/my-jobs" element={<MyJobs />} />
-          <Route
-            path={
-              user?.user?.accountType === "seeker"
-                ? "/user-profile"
-                : "/user-profile/:id"
-            }
-            element={<UserProfile />}
-          />
-          <Route path="/company-profile" element={<CompanyProfile />} />
-          <Route path="/job-details/:id" element={<JobDetails />} />
-          <Route path="/company-profile/:id" element={<CompanyProfile />} />
-          <Route path="/post-job" element={<CreateJob />} />
-          <Route path="/job-detail/:id" element={<JobDetails />} />
-          <Route path="/post-job" element={<CreateJob />} />
-          <Route path="/my-job" element={<MyJobs />} />
-          <Route path="/salary" element={<SalaryPage />} />
-          <Route
-            path="/edit-job/:id"
-            element={<UpdateJob />}
-            loader={({ params }) =>
-              fetch(`http://localhost:5000/all-jobs/${params.id}`)
-            }
-          />
-        </Route>
-      </Routes>
-      {user && <Footer />}
-    </main>
-  );
-};
 
 export default App;
