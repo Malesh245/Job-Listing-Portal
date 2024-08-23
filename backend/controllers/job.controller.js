@@ -5,6 +5,7 @@ export const postJob = async (req, res) => {
     const {
       title,
       description,
+      category,
       skills,
       requirements,
       salary,
@@ -17,9 +18,24 @@ export const postJob = async (req, res) => {
 
     const userId = req.id;
 
+    console.log("Received data:", {
+      title,
+      description,
+      category,
+      skills,
+      requirements,
+      salary,
+      location,
+      jobType,
+      experience,
+      position,
+      companyId,
+    });
+
     if (
       !title ||
       !description ||
+      !category ||
       !skills ||
       !requirements ||
       !salary ||
@@ -34,9 +50,11 @@ export const postJob = async (req, res) => {
         success: false,
       });
     }
+
     const job = await Job.create({
       title,
       description,
+      category,
       skills,
       requirements: requirements.split(","),
       salary: Number(salary),
@@ -47,6 +65,7 @@ export const postJob = async (req, res) => {
       company: companyId,
       created_by: userId,
     });
+
     return res.status(201).json({
       message: "New job created successfully.",
       job,
@@ -54,9 +73,10 @@ export const postJob = async (req, res) => {
     });
   } catch (error) {
     console.log(error);
-    return res.status(400).json({ message: "Failed to creating a new job." });
+    return res.status(400).json({ message: "Failed to create a new job." });
   }
 };
+
 // update Job
 
 export const updateJob = async (req, res) => {
@@ -153,5 +173,45 @@ export const getJobByLoggedAdminUser = async (req, res) => {
   } catch (error) {
     console.log(error);
     return res.status(400).json({ message: error });
+  }
+};
+
+// Delete a job
+export const deleteJob = async (req, res, next) => {
+  try {
+    await Job.findByIdAndDelete(req.params.id);
+    res
+      .status(200)
+      .json({ success: true, message: "Job deleted successfully" });
+  } catch (error) {
+    next(error);
+  }
+};
+
+// Approve a job
+export const approveJob = async (req, res, next) => {
+  try {
+    const job = await Job.findByIdAndUpdate(
+      req.params.id,
+      { status: "approved" },
+      { new: true }
+    );
+    res.status(200).json({ success: true, job });
+  } catch (error) {
+    next(error);
+  }
+};
+
+// Reject a job
+export const rejectJob = async (req, res, next) => {
+  try {
+    const job = await Job.findByIdAndUpdate(
+      req.params.id,
+      { status: "rejected" },
+      { new: true }
+    );
+    res.status(200).json({ success: true, job });
+  } catch (error) {
+    next(error);
   }
 };

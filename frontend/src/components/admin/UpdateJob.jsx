@@ -24,6 +24,7 @@ const UpdateJob = () => {
   const [input, setInput] = useState({
     title: "",
     description: "",
+    category: "",
     skills: [],
     requirements: "",
     salary: "",
@@ -55,6 +56,7 @@ const UpdateJob = () => {
           setInput({
             title: job.title,
             description: job.description,
+            category: job.category,
             skills: job.skills,
             requirements: job.requirements,
             salary: job.salary,
@@ -96,6 +98,10 @@ const UpdateJob = () => {
     });
   };
 
+  const handleSelectCategory = (e) => {
+    setInput({ ...input, category: e.target.value });
+  };
+
   const submitHandler = async (e) => {
     e.preventDefault();
 
@@ -126,6 +132,29 @@ const UpdateJob = () => {
       dispatch(setLoading(false));
     }
   };
+
+  const categories = [
+    "Software Development",
+    "Web Development",
+    "Cybersecurity",
+    "Data Science",
+    "Artificial Intelligence",
+    "Cloud Computing",
+    "DevOps",
+    "Mobile App Development",
+    "Blockchain",
+    "Database Administration",
+    "Network Administration",
+    "UI/UX Design",
+    "Game Development",
+    "IoT (Internet of Things)",
+    "Big Data",
+    "Machine Learning",
+    "IT Project Management",
+    "IT Support and Helpdesk",
+    "Systems Administration",
+    "IT Consulting",
+  ];
 
   const options = [
     { value: "JavaScript", label: "JavaScript" },
@@ -201,6 +230,21 @@ const UpdateJob = () => {
               />
             </div>
             <div>
+              <Label>Job Category</Label>
+              <select
+                value={input.category}
+                onChange={handleSelectCategory}
+                className="w-full focus-visible:ring-offset-0 focus-visible:ring-0 my-1"
+              >
+                <option value="">Select Job Category</option>
+                {categories.map((category) => (
+                  <option key={category} value={category}>
+                    {category}
+                  </option>
+                ))}
+              </select>
+            </div>
+            <div>
               <Label>Location</Label>
               <Input
                 type="text"
@@ -243,34 +287,34 @@ const UpdateJob = () => {
                 className="focus-visible:ring-offset-0 focus-visible:ring-0 my-1"
               />
             </div>
-            {companies.length !== 0 && (
+            {companies.length > 0 && (
               <Select onValueChange={handleSelectChange}>
-                <SelectTrigger className="w-[180px]">
+                <SelectTrigger className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50">
                   <SelectValue placeholder="Select a Company" />
                 </SelectTrigger>
                 <SelectContent>
                   <SelectGroup>
-                    {companies &&
-                      companies.map((company) => (
-                        <SelectItem
-                          key={company?._id}
-                          value={company?.name.toLowerCase()}
-                        >
-                          {company?.name}
+                    {companies.map((company) => {
+                      return (
+                        <SelectItem value={company?.name?.toLowerCase()}>
+                          {company.name}
                         </SelectItem>
-                      ))}
+                      );
+                    })}
                   </SelectGroup>
                 </SelectContent>
               </Select>
             )}
           </div>
-          <Button
-            onClick={submitHandler}
-            disabled={companies?.length === 0}
-            className="w-full mt-4"
-          >
-            Update Job
-          </Button>
+          <div className="w-full flex items-center justify-end">
+            <Button
+              onClick={submitHandler}
+              disabled={companies?.length === 0 ? true : false}
+              className="mt-6"
+            >
+              Post New Job
+            </Button>
+          </div>
           {companies.length === 0 && (
             <p className="text-red-600 text-xs font-bold text-center my-3">
               *Please register a company first, before posting a job

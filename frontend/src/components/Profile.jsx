@@ -1,19 +1,14 @@
 import React, { useEffect, useState } from "react";
-import Navbar from "./shared/Navbar";
 import { Avatar, AvatarImage } from "./ui/avatar";
 import { Badge } from "./ui/badge";
 import { Contact, Mail, Pen } from "lucide-react";
-import ApplicationTable from "./ApplicationTable";
 import { useSelector } from "react-redux";
-import { Button } from "./ui/button";
-import { UpdateProfileDialog } from "./UpdateProfileDialog";
 import { useNavigate } from "react-router-dom";
 import useGetAppliedJobs from "@/hooks/useGetAppliedJobs";
 import { Label } from "./ui/label";
 
 const Profile = () => {
   useGetAppliedJobs();
-  const [open, setOpen] = useState(false);
   const { authUser } = useSelector((store) => store.auth);
   const navigate = useNavigate();
 
@@ -44,13 +39,6 @@ const Profile = () => {
               </p>
             </div>
           </div>
-          <Button
-            onClick={() => setOpen(true)}
-            className="self-start md:self-auto"
-            variant="outline"
-          >
-            <Pen />
-          </Button>
         </div>
         <div className="my-5">
           <div className="flex items-center gap-3 my-2">
@@ -91,11 +79,6 @@ const Profile = () => {
           )}
         </div>
       </div>
-      <div className="max-w-6xl mx-auto bg-white rounded-2xl my-5 p-6 sm:p-8">
-        <h1 className="text-xl font-bold mb-5">Applied Jobs</h1>
-        <ApplicationTable />
-      </div>
-      <UpdateProfileDialog open={open} setOpen={setOpen} />
     </div>
   );
 };

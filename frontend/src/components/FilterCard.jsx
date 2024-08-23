@@ -17,6 +17,7 @@ const filterData = [
       "Data Science",
       "FullStack Developer",
       "Nextjs Developer",
+      "Software Developer",
     ],
   },
   {

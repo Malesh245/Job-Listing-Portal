@@ -1,7 +1,6 @@
 import React, { useState } from "react";
 import { Label } from "../ui/label";
 import { Input } from "../ui/input";
-import Navbar from "../shared/Navbar";
 import { Button } from "../ui/button";
 import axios from "axios";
 import { useDispatch, useSelector } from "react-redux";
@@ -21,8 +20,10 @@ import { useNavigate } from "react-router-dom";
 
 const CreateJobs = () => {
   const [selectedOption, setSelectedOption] = useState([]);
+
   const [input, setInput] = useState({
     title: "",
+    category: "",
     description: "",
     skills: [],
     requirements: "",
@@ -34,6 +35,8 @@ const CreateJobs = () => {
     companyId: "",
   });
   const { companies } = useSelector((store) => store.company);
+  console.log(companies);
+
   const dispatch = useDispatch();
   const navigate = useNavigate();
 
@@ -42,10 +45,27 @@ const CreateJobs = () => {
   };
 
   const handleSelectChange = (value) => {
+    console.log("Selected value:", value); // Ensure this is correct
+
     const selectedCompany = companies.find(
       (company) => company.name.toLowerCase() === value
     );
-    setInput({ ...input, companyId: selectedCompany._id });
+
+    if (selectedCompany) {
+      console.log("Selected company:", selectedCompany); // Log the whole object to inspect
+
+      // Check the type of _id
+      console.log("Type of _id:", typeof selectedCompany._id);
+      console.log("Company ID:", selectedCompany._id); // Should log the actual ID, not [object Object]
+
+      setInput({ ...input, companyId: selectedCompany._id });
+    } else {
+      console.log("Selected company not found");
+    }
+  };
+
+  const handleSelectCategory = (e) => {
+    setInput({ ...input, category: e.target.value });
   };
 
   const handleSkillsChange = (selectedOptions) => {
@@ -82,6 +102,7 @@ const CreateJobs = () => {
     }
     setInput({
       title: "",
+      category: "",
       description: "",
       skills: [],
       requirements: "",
@@ -94,6 +115,29 @@ const CreateJobs = () => {
     });
     setSelectedOption([]);
   };
+  console.log(input);
+  const categories = [
+    "Software Development",
+    "Web Development",
+    "Cybersecurity",
+    "Data Science",
+    "Artificial Intelligence",
+    "Cloud Computing",
+    "DevOps",
+    "Mobile App Development",
+    "Blockchain",
+    "Database Administration",
+    "Network Administration",
+    "UI/UX Design",
+    "Game Development",
+    "IoT (Internet of Things)",
+    "Big Data",
+    "Machine Learning",
+    "IT Project Management",
+    "IT Support and Helpdesk",
+    "Systems Administration",
+    "IT Consulting",
+  ];
 
   const options = [
     { value: "JavaScript", label: "JavaScript" },
@@ -169,6 +213,22 @@ const CreateJobs = () => {
               />
             </div>
             <div>
+              <Label>Industry Category</Label>
+              <select
+                value={input.category}
+                onChange={handleSelectCategory}
+                className="w-full focus-visible:ring-offset-0 focus-visible:ring-0 my-1"
+              >
+                <option value="">Select Job Category</option>
+                {categories.map((category) => (
+                  <option key={category} value={category}>
+                    {category}
+                  </option>
+                ))}
+              </select>
+            </div>
+
+            <div>
               <Label>Location</Label>
               <Input
                 type="text"
@@ -211,36 +271,34 @@ const CreateJobs = () => {
                 className="focus-visible:ring-offset-0 focus-visible:ring-0 my-1"
               />
             </div>
-            {companies.length !== 0 && (
+            {companies.length > 0 && (
               <Select onValueChange={handleSelectChange}>
-                <SelectTrigger className="w-[180px]">
+                <SelectTrigger className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50">
                   <SelectValue placeholder="Select a Company" />
                 </SelectTrigger>
                 <SelectContent>
                   <SelectGroup>
-                    {companies &&
-                      companies.map((company) => {
-                        return (
-                          <SelectItem
-                            key={company?._id}
-                            value={company?.name.toLowerCase()}
-                          >
-                            {company?.name}
-                          </SelectItem>
-                        );
-                      })}
+                    {companies.map((company) => {
+                      return (
+                        <SelectItem value={company?.name?.toLowerCase()}>
+                          {company.name}
+                        </SelectItem>
+                      );
+                    })}
                   </SelectGroup>
                 </SelectContent>
               </Select>
             )}
           </div>
-          <Button
-            onClick={submitHandler}
-            disabled={companies?.length === 0 ? true : false}
-            className="w-full mt-4"
-          >
-            Post New Job
-          </Button>
+          <div className="w-full flex items-center justify-end">
+            <Button
+              onClick={submitHandler}
+              disabled={companies?.length === 0 ? true : false}
+              className="mt-6"
+            >
+              Post New Job
+            </Button>
+          </div>
           {companies.length === 0 && (
             <p className="text-red-600 text-xs font-bold text-center my-3">
               *Please register a company first, before posting a jobs

@@ -14,10 +14,11 @@ const userSchema = new mongoose.Schema(
     },
     phoneNumber: {
       type: Number,
-      required: true,
     },
     password: {
       type: String,
+      require: true,
+      select: false,
     },
     googleId: {
       type: String,
@@ -40,8 +41,7 @@ const userSchema = new mongoose.Schema(
     },
     role: {
       type: String,
-      enum: ["student", "recruiter"],
-      required: true,
+      enum: ["student", "recruiter", "super admin"],
     },
     profile: {
       bio: { type: String },
@@ -55,6 +55,18 @@ const userSchema = new mongoose.Schema(
       },
     },
   },
+
   { timestamps: true }
 );
+// Compare user password
+userSchema.methods.comparePassword = async function (enteredPassword) {
+  return await bcrypt.compare(enteredPassword, this.password);
+};
+
+// Return JWT token
+userSchema.methods.getJWTToken = function () {
+  return jwt.sign({ id: this._id, role: this.role }, process.env.JWT_SECRET, {
+    expiresIn: process.env.JWT_EXPIRES_TIME,
+  });
+};
 export const User = mongoose.model("User", userSchema);

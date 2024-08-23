@@ -10,6 +10,14 @@ const jobSchema = new mongoose.Schema(
       type: String,
       required: true,
     },
+    category: {
+      type: String,
+      required: true,
+    },
+    newsLettersSent: {
+      type: Boolean,
+      default: false,
+    },
     skills: [
       {
         type: String,

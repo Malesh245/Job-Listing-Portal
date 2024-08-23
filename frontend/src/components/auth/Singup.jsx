@@ -78,7 +78,8 @@ const Singup = () => {
       toast.error("Please select a account type.");
       return;
     }
-    window.location.href = `http://localhost:8000/api/v1/auth/${provider}?role=${input.role}`;
+    console.log("Helle User", input.role);
+    window.location.href = `http://localhost:8000/api/v1/user/auth/${provider}?role=${input.role}`;
   };
 
   useEffect(() => {

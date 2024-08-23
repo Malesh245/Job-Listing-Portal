@@ -35,9 +35,28 @@ export function ProfilePopover() {
   return (
     <Popover>
       <PopoverTrigger asChild>
-        <Avatar className="cursor-pointer">
-          <AvatarImage src={authUser?.profile?.profilePhoto} alt="@shadcn" />
-        </Avatar>
+        {authUser?.role === "student" && (
+          <Link to="/dashboard">
+            <Avatar className="cursor-pointer">
+              <AvatarImage
+                src={authUser?.profile?.profilePhoto}
+                alt="@shadcn"
+              />
+            </Avatar>
+          </Link>
+        )}
+      </PopoverTrigger>
+      <PopoverTrigger asChild>
+        {authUser?.role === "recruiter" && (
+          <Link to="/admin/companies">
+            <Avatar className="cursor-pointer">
+              <AvatarImage
+                src={authUser?.profile?.profilePhoto}
+                alt="@shadcn"
+              />
+            </Avatar>
+          </Link>
+        )}
       </PopoverTrigger>
       <PopoverContent className="w-80 sm:w-72 md:w-80 lg:w-96">
         <div className="grid gap-4">

@@ -5,6 +5,8 @@ import jwt from "jsonwebtoken";
 import getDataUri from "../utils/datauri.js";
 import cloudinary from "../utils/cloudinary.js";
 import sendEmail from "../utils/email.js";
+import { ErrorHandler } from "../utils/errorHandler.js";
+import { sendToken } from "../utils/sendtoken.js";
 
 // Register user with email verification
 export const register = async (req, res) => {
@@ -343,5 +345,64 @@ export const updateProfile = async (req, res) => {
   } catch (error) {
     console.log(error);
     return res.status(500).json({ message: "Server error", success: false });
+  }
+};
+// Upadte password
+export const updatePassword = async (req, res, next) => {
+  try {
+    const user = await User.findById(req.user._id).select("+password");
+
+    if (!user) {
+      return next(new ErrorHandler("User not found.", 404));
+    }
+
+    const isPasswordMatched = await user.comparePassword(req.body.oldPassword);
+
+    if (!isPasswordMatched) {
+      return next(new ErrorHandler("Old password is incorrect.", 400));
+    }
+
+    if (req.body.newPassword !== req.body.confirmPassword) {
+      return next(
+        new ErrorHandler("New password & confirm password do not match.", 400)
+      );
+    }
+
+    user.password = req.body.newPassword;
+    await user.save();
+    sendToken(user, 200, res, "Password updated successfully.");
+  } catch (error) {
+    next(error);
+  }
+};
+
+export const getAllUsers = async (req, res, next) => {
+  try {
+    const users = await User.find();
+    res.status(200).json({ success: true, users });
+  } catch (error) {
+    next(error);
+  }
+};
+
+export const updateUser = async (req, res, next) => {
+  try {
+    const user = await User.findByIdAndUpdate(req.params.id, req.body, {
+      new: true,
+    });
+    res.status(200).json({ success: true, user });
+  } catch (error) {
+    next(error);
+  }
+};
+
+export const deleteUser = async (req, res, next) => {
+  try {
+    await User.findByIdAndDelete(req.params.id);
+    res
+      .status(200)
+      .json({ success: true, message: "User deleted successfully" });
+  } catch (error) {
+    next(error);
   }
 };

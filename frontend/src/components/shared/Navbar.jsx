@@ -77,7 +77,7 @@ const Navbar = () => {
               <>
                 <li className="hover:text-[#6A38C2] cursor-pointer">
                   <Link
-                    to={"/admin/companies"}
+                    to={"/admin/companies "}
                     onClick={() => setIsMenuOpen(false)}
                   >
                     Companies
